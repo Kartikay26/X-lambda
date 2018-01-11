@@ -1,19 +1,7 @@
 import tree_parse
 
-class LispEnvironment():
-    "Environment for lisp execution"
-    def __init__(self, outer=None):
-        # create a global env if called directly,
-        # otherwise a sub-environment
-        self.outer = outer
-        if outer is None:
-            # define global environment
-            self.globalEnv = True
-        else:
-            # do something like inheriting variables from outside
-            pass
-
-globalEnv = LispEnvironment()
+# TODO: define global env here
+globalEnv = {}
 
 class LispStatement():
     "The internal representation of a lisp statement"
@@ -42,9 +30,19 @@ class LispStatement():
              b. Evaluating the new body
         """
         if type(self.tree) == list:
-            # do something recursively?
-            # creating a new environment or something?
-            pass
+            # either spl form or application
+            operator = LispStatement(self.tree[0]).evaluate()
+            operands = [LispStatement(self.tree[i]).evaluate()
+                        for i in range(1,len(self.tree))]
+            # find operator in environment
+            # if operator denotes spl form, use spl rules
         else:
-            # it is already a primitive value
-            return self.tree
+            # it is either primitive data or primitive procedure
+            # or it might be VARIABLE NAME denoting one of these
+            x = self.tree
+            if type(x) == int:
+                # primitive data ... return directly
+                return x
+            elif type(x) == str:
+                # TODO: something in the env ... try to find it
+                return x
