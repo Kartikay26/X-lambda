@@ -2,6 +2,7 @@
 Trying to make a lisp interpreter in python
 """
 
+import tree_parse
 import lisp_interpreter
 
 def main():
@@ -13,7 +14,8 @@ def main():
             i = raw_input(">>> ")
         except (EOFError, KeyboardInterrupt):
             break
-        l = lisp_interpreter.LispStatement(i)
+        t = tree_parse.createTree(i).toList()
+        l = lisp_interpreter.LispStatement(t)
         # eval
         r = l.evaluate()
         # print

@@ -1,19 +1,13 @@
-import tree_parse
-
 # TODO: define global env here
 globalEnv = {}
 
 class LispStatement():
     "The internal representation of a lisp statement"
-    def __init__(self, statement, env=None):
-        if type(statement) == list:
-            self.tree = statement
-        elif type(statement) == str:
-            self.tree = tree_parse.createTree(statement).toList()
-        else:
-            raise TypeError("Provided statement should be str or list")
+    def __init__(self, tree, env=None):
+        self.tree = tree
         if env is None:
             env = globalEnv
+        self.environment = env
     def evaluate(self):
         """
         Evaluates the statement and returns its value.
@@ -31,11 +25,19 @@ class LispStatement():
         """
         if type(self.tree) == list:
             # either spl form or application
-            operator = LispStatement(self.tree[0]).evaluate()
-            operands = [LispStatement(self.tree[i]).evaluate()
-                        for i in range(1,len(self.tree))]
-            # find operator in environment
+            operator = self.tree[0]
             # if operator denotes spl form, use spl rules
+            if operator == "def":
+                assert len(self.tree) == 3
+                a = self.tree[1]
+                b = self.tree[2]
+                self.environment[a] = LispStatement(b).evaluate()
+                return self.environment[a]
+            # otherwise find operator in environment
+
+            # for later:
+            #operands = [LispStatement(self.tree[i]).evaluate()
+            #            for i in range(1,len(self.tree))]
         else:
             # it is either primitive data or primitive procedure
             # or it might be VARIABLE NAME denoting one of these
@@ -44,5 +46,4 @@ class LispStatement():
                 # primitive data ... return directly
                 return x
             elif type(x) == str:
-                # TODO: something in the env ... try to find it
-                return x
+                return self.environment[x]
