@@ -1,19 +1,20 @@
+NUMBER = 1
+STRING = 2
+WHITESPACE = 3
+SYMBOL = 4
+
+def getmode(char):
+    modes = {NUMBER: '1234567890',
+             WHITESPACE: ' \t\n',
+             SYMBOL: '()'}
+    for m in modes:
+        if char in modes[m]:
+            return m
+    # else ... default mode is STRING
+    return STRING
+
 def tokeniser(string):
     "A generator that yields tokens based on input"
-    NUMBER = 1
-    STRING = 2
-    WHITESPACE = 3
-    SYMBOL = 4
-    def getmode(char):
-        modes = {NUMBER: '1234567890',
-                 WHITESPACE: ' \t\n',
-                 SYMBOL: '()'}
-        for m in modes:
-            if char in modes[m]:
-                return m
-        # else ... default mode is STRING
-        return STRING
-
     mode = WHITESPACE
     forming_token = ""
     for ch in string:
