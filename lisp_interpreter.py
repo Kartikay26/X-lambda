@@ -8,7 +8,7 @@ class LispStatement():
         if env is None:
             env = LispEnvironment() # Create a global env
         self.environment = env
-        self.tree = tree_parse.createTree(self.statement)
+        self.tree = tree_parse.createTree(self.statement).toList()
     def evaluate(self):
         "Evaluates the statement and returns its value"
         if type(self.tree) == list:
