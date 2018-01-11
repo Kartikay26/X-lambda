@@ -2,12 +2,7 @@
 Trying to make a lisp interpreter in python
 """
 
-class LispStatement():
-    "A single statement in Lisp"
-    def __init__(self,statement):
-        pass
-    def evaluate(self):
-        return 0
+import lisp_interpreter
 
 def main():
     "Starts the main REPL loop"
@@ -18,12 +13,12 @@ def main():
             i = raw_input(">>> ")
         except EOFError:
             break
-        l = LispStatement(i)
+        l = lisp_interpreter.LispStatement(i)
         # eval
         r = l.evaluate()
         # print
         print r
-        # loop ... back to 12
+        # loop ... (while)
     print "Bye!"
 
 if __name__=="__main__":
