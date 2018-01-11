@@ -76,7 +76,7 @@ def createTree(string, rootNode=None):
             cur_node = cur_node.above
         else:
             cur_node.addNodeBelow(TreeNode(token))
-    return cur_node
+    return cur_node.below[0]
 
 class TreeNode:
     "A single Node in a Tree"
@@ -85,7 +85,7 @@ class TreeNode:
         self.above = None
         self.below = []
     def addNodeBelow(self, node):
-        self.above = self
+        node.above = self
         self.below.append(node)
     def toList(self):
         if len(self.below) == 0:
