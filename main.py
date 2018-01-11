@@ -11,7 +11,7 @@ def main():
         # read
         try:
             i = raw_input(">>> ")
-        except EOFError:
+        except (EOFError, KeyboardInterrupt):
             break
         l = lisp_interpreter.LispStatement(i)
         # eval
@@ -19,7 +19,7 @@ def main():
         # print
         print r
         # loop ... (while)
-    print "Bye!"
+    print "\nBye!"
 
 if __name__=="__main__":
     main()
