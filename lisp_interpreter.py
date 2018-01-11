@@ -1,4 +1,5 @@
 # TODO: define global env here
+
 globalEnv = {}
 
 class LispStatement():
@@ -33,11 +34,18 @@ class LispStatement():
                 b = self.tree[2]
                 self.environment[a] = LispStatement(b).evaluate()
                 return self.environment[a]
-            # otherwise find operator in environment
-
-            # for later:
-            #operands = [LispStatement(self.tree[i]).evaluate()
-            #            for i in range(1,len(self.tree))]
+            elif operator == "lambda":
+                pass
+            else:
+                # otherwise find operator in environment
+                # also check "upper" environments
+                # make sure it is a function
+                # evaluate arguments
+                operands = [LispStatement(self.tree[i]).evaluate()
+                           for i in range(1,len(self.tree))]
+                # apply the function
+                # (difficult!)
+                pass
         else:
             # it is either primitive data or primitive procedure
             # or it might be VARIABLE NAME denoting one of these
