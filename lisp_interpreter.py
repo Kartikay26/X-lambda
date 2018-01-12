@@ -1,6 +1,36 @@
+from copy import deepcopy as copy
+
 # TODO: define global env here
 
 globalEnv = {}
+
+class LispProcedure():
+    "Defines a lisp procedure given by a lambda function"
+    def __init__(self, tree, outer_env):
+        """Given a tree like (lambda (x) (* x x)), create an internal
+         representation of the procedure"""
+        self.tree = tree
+        assert self.tree[0] == "lambda"
+        assert len(self.tree) == 3
+        assert type(self.tree[1]) == list
+        # TODO: handle above cases more nicely
+        self.num_args = len(self.tree[1])
+        self.args = self.tree[1]
+        for a in args:
+            assert type(a) == str
+        self.internal_env = copy(outer_env)
+        self.return_statement = self.tree[2]
+
+    def apply(self, arg_values):
+        """Applies the procedure to the given arguments, which are
+        already evaluated. arg_values should be list of primitive
+        numbers or procedures"""
+        for x in arg_values:
+            assert type(x)==str or isinstance(x,LispProcedure)
+        # first check whether arguments match in number
+        # then unpack arguments into environment
+        # then traverse tree replacing formal parameters
+        # then return the newly modified tree
 
 class LispStatement():
     "The internal representation of a lisp statement"
@@ -29,6 +59,7 @@ class LispStatement():
             operator = self.tree[0]
             # if operator denotes spl form, use spl rules
             if operator == "define":
+                # TODO: refactor into another function or class
                 assert len(self.tree) == 3
                 a = self.tree[1]
                 b = self.tree[2]
