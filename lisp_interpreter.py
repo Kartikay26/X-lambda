@@ -28,7 +28,7 @@ class LispStatement():
             # either spl form or application
             operator = self.tree[0]
             # if operator denotes spl form, use spl rules
-            if operator == "def":
+            if operator == "define":
                 assert len(self.tree) == 3
                 a = self.tree[1]
                 b = self.tree[2]
