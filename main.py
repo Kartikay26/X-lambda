@@ -14,9 +14,9 @@ def main():
             i = raw_input(">>> ")
         except (EOFError, KeyboardInterrupt):
             break
+        # eval
         t = tree_parse.createTree(i).toList()
         l = lisp_interpreter.LispStatement(t)
-        # eval
         r = l.evaluate()
         # print
         print r
