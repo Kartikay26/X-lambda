@@ -16,7 +16,7 @@ class LispProcedure():
         # TODO: handle above cases more nicely
         self.num_args = len(self.tree[1])
         self.args = self.tree[1]
-        for a in args:
+        for a in self.args:
             assert type(a) == str
         self.internal_env = copy(outer_env)
         self.return_statement = self.tree[2]
