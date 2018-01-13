@@ -49,7 +49,7 @@ class LispProcedure():
         if debug:
             print "Applying procedure,", self.tree
             if self.internal_env is not None:
-                print "Environment:", internal_env
+                print "Environment:", self.internal_env
         assert type(arg_values) == list
         for x in arg_values:
             assert (type(x)==float or type(x)==int or
