@@ -14,6 +14,8 @@ def main():
             i = raw_input(">>> ")
             if i == "":
                 continue
+            while i.count("(") > i.count(")"):
+                i += raw_input("... ")
         except (EOFError, KeyboardInterrupt):
             break
         # eval
