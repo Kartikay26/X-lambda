@@ -146,6 +146,9 @@ class LispStatement():
                                 ]
                 # apply the function
                 new_statement = operator.apply(operands)
+                if debug:
+                    print "New statement is evaluated to,",
+                    print new_statement.tree
                 return new_statement.evaluate()
         else:
             # it is either primitive data or primitive procedure
@@ -153,6 +156,8 @@ class LispStatement():
             x = self.tree
             if type(x) == float or type(x) == int:
                 # primitive data ... return directly
+                if debug:
+                    print "Statement evaluated to,",x
                 return x
             elif type(x) == str:
                 return self.environment[x]

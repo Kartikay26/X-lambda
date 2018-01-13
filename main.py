@@ -22,6 +22,8 @@ def main():
                 i += raw_input("... ")
         except (EOFError, KeyboardInterrupt):
             break
+        if lisp_interpreter.debug:
+            print "<<< ", i
         # eval
         t = tree_parse.createTree(i).toList()
         l = lisp_interpreter.LispStatement(t)
