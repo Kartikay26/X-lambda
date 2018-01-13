@@ -14,6 +14,10 @@ def main():
             i = raw_input(">>> ")
             if i == "":
                 continue
+            if i == "DEBUG":
+                # activate debug mode
+                lisp_interpreter.debug = True
+                continue
             while i.count("(") > i.count(")"):
                 i += raw_input("... ")
         except (EOFError, KeyboardInterrupt):

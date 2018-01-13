@@ -1,3 +1,5 @@
+debug = False
+
 class LispEnvironment():
     "Lisp Statement Environment holding variable/value pairs"
     def __init__(self, inherit=None):
@@ -13,12 +15,21 @@ class LispEnvironment():
                 return self.inherit[variable]
             else:
                 raise KeyError("No such variable, "+variable+".")
+    def __repr__(self):
+        if self.inherit is None:
+            return "GlobalEnv"
+        else:
+            return str(self.env)
 
 class LispProcedure():
     "Defines a lisp procedure given by a lambda function"
     def __init__(self, tree, outer_env):
         """Given a tree like (lambda (x) (* x x)), create an internal
          representation of the procedure"""
+        if debug:
+            print "Creating procedure,", tree
+            if outer_env is not None:
+                print "Environment:", outer_env
         self.tree = tree
         assert self.tree[0] == "lambda"
         assert len(self.tree) == 3
@@ -35,6 +46,10 @@ class LispProcedure():
         """Applies the procedure to the given arguments, which are
         already evaluated. arg_values should be list of primitive
         numbers or procedures"""
+        if debug:
+            print "Applying procedure,", self.tree
+            if self.internal_env is not None:
+                print "Environment:", internal_env
         assert type(arg_values) == list
         for x in arg_values:
             assert (type(x)==float or type(x)==int or
@@ -57,6 +72,10 @@ class PrimitiveLispProcedure(LispProcedure):
 class LispStatement():
     "The internal representation of a lisp statement"
     def __init__(self, tree, env=None):
+        if debug:
+            print "Creating statement,", tree
+            if env is not None:
+                print "Environment:", env
         self.tree = tree
         if env is None:
             env = globalEnv
@@ -76,6 +95,10 @@ class LispStatement():
                 while substituting formal parameters
              b. Evaluating the new body
         """
+        if debug:
+            print "Evaluating statement,", self.tree
+            if self.environment is not None:
+                print "Environment:", self.environment
         if type(self.tree) == list:
             # either spl form or application
             operator = self.tree[0]
