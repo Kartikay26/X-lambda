@@ -124,4 +124,10 @@ class LispStatement():
 globalEnv = LispEnvironment()
 
 globalEnv['+'] = PrimitiveLispProcedure(lambda l: sum(l))
-globalEnv['*'] = PrimitiveLispProcedure(lambda (x,y): x*y)
+globalEnv['-'] = PrimitiveLispProcedure(
+                    lambda l: (l[0]-l[1] if len(l)==2 else -l[0])
+                    )
+globalEnv['*'] = PrimitiveLispProcedure(
+                    lambda l: reduce(lambda x,y:x*y, l)
+                    )
+globalEnv['/'] = PrimitiveLispProcedure(lambda (x,y): x/y)
