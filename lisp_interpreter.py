@@ -1,7 +1,7 @@
 from copy import deepcopy as copy
 
 # TODO: define global env here
-
+# TODO: Environment class which can get variable from outer envs also
 globalEnv = {}
 
 class LispProcedure():
@@ -25,12 +25,17 @@ class LispProcedure():
         """Applies the procedure to the given arguments, which are
         already evaluated. arg_values should be list of primitive
         numbers or procedures"""
+        assert type(arg_values) == list
         for x in arg_values:
-            assert type(x)==str or isinstance(x,LispProcedure)
+            assert type(x)==int or isinstance(x,LispProcedure)
         # first check whether arguments match in number
+        assert len(arg_values) == self.num_args
         # then unpack arguments into environment
-        # then traverse tree replacing formal parameters
-        # then return the newly modified tree
+        for (variable,value) in zip(self.args,arg_values):
+            self.internal_env[variable] = value
+        # return a LispStatement with a new environment
+        return LispStatement(self.return_statement,
+                             self.internal_env)
 
 class LispStatement():
     "The internal representation of a lisp statement"
@@ -66,17 +71,26 @@ class LispStatement():
                 self.environment[a] = LispStatement(b).evaluate()
                 return self.environment[a]
             elif operator == "lambda":
-                pass
+                return LispProcedure(self.tree, self.environment)
             else:
                 # otherwise find operator in environment
+                if isinstance(operator, LispProcedure):
+                    pass
+                else:
+                    operator = self.environment[operator]
+                    if isinstance(operator, LispProcedure):
+                        pass
+                    elif type(operator) == int:
+                        assert len(self.tree) == 1
+                        return operator
                 # also check "upper" environments
                 # make sure it is a function
                 # evaluate arguments
                 operands = [LispStatement(self.tree[i]).evaluate()
                            for i in range(1,len(self.tree))]
                 # apply the function
-                # (difficult!)
-                pass
+                new_statement = operator.apply(operands)
+                return new_statement.evaluate()
         else:
             # it is either primitive data or primitive procedure
             # or it might be VARIABLE NAME denoting one of these
