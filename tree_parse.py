@@ -4,7 +4,7 @@ WHITESPACE = 3
 SYMBOL = 4
 
 def getmode(char):
-    modes = {NUMBER: '1234567890',
+    modes = {NUMBER: '1234567890.',
              WHITESPACE: ' \t\n',
              SYMBOL: '()'}
     for m in modes:
@@ -60,7 +60,7 @@ class TreeNode:
     def toList(self):
         if len(self.below) == 0:
             try:
-                return int(self.token)
+                return float(self.token)
             except ValueError:
                 return self.token
         l = self.below

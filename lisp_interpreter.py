@@ -37,10 +37,11 @@ class LispProcedure():
         numbers or procedures"""
         assert type(arg_values) == list
         for x in arg_values:
-            assert type(x)==int or isinstance(x,LispProcedure)
+            assert (type(x)==float or type(x)==int or
+                isinstance(x,LispProcedure))
         # first check whether arguments match in number
         assert len(arg_values) == self.num_args
-        # then unpack arguments into environment
+        # then unpack arguments floato environment
         for (variable,value) in zip(self.args,arg_values):
             self.internal_env[variable] = value
         # return a LispStatement with a new environment
@@ -80,7 +81,7 @@ class LispStatement():
             operator = self.tree[0]
             # if operator denotes spl form, use spl rules
             if operator == "define":
-                # TODO: refactor into another function or class
+                # TODO: refactor floato another function or class
                 assert len(self.tree) == 3
                 a = self.tree[1]
                 b = self.tree[2]
@@ -108,7 +109,7 @@ class LispStatement():
                     operator = self.environment[operator]
                     if isinstance(operator, LispProcedure):
                         pass
-                    elif type(operator) == int:
+                    elif type(operator) == float or type(operator) == int:
                         assert len(self.tree) == 1
                         return operator
                 # also check "upper" environments
@@ -127,7 +128,7 @@ class LispStatement():
             # it is either primitive data or primitive procedure
             # or it might be VARIABLE NAME denoting one of these
             x = self.tree
-            if type(x) == int:
+            if type(x) == float or type(x) == int:
                 # primitive data ... return directly
                 return x
             elif type(x) == str:
@@ -146,4 +147,9 @@ globalEnv['-'] = PrimitiveLispProcedure(
 globalEnv['*'] = PrimitiveLispProcedure(
                     lambda l: reduce(lambda x,y:x*y, l)
                     )
-globalEnv['/'] = PrimitiveLispProcedure(lambda (x,y): x/y)
+globalEnv['/'] = PrimitiveLispProcedure(lambda (x,y): float(x)/y)
+globalEnv['>'] = PrimitiveLispProcedure(lambda (x,y): x>y)
+globalEnv['<'] = PrimitiveLispProcedure(lambda (x,y): x<y)
+globalEnv['>='] = PrimitiveLispProcedure(lambda (x,y): x>=y)
+globalEnv['<='] = PrimitiveLispProcedure(lambda (x,y): x<=y)
+globalEnv['abs'] = PrimitiveLispProcedure(lambda (x,): abs(x))
