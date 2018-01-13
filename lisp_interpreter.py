@@ -88,6 +88,18 @@ class LispStatement():
                 return self.environment[a]
             elif operator == "lambda":
                 return LispProcedure(self.tree, self.environment)
+            elif operator == "if":
+                if_cond = self.tree[1]
+                if_true = self.tree[2]
+                if_false = self.tree[3]
+                if LispStatement(if_cond,
+                self.environment).evaluate():
+                    return LispStatement(if_true,
+                            self.environment).evaluate()
+                else:
+                    return LispStatement(if_false,
+                            self.environment).evaluate()
+                pass
             else:
                 # otherwise find operator in environment
                 if isinstance(operator, LispProcedure):
