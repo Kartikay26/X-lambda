@@ -1,4 +1,7 @@
+from copy import deepcopy
+
 debug = False
+PrimitiveDataTypes = [int, float, bool]
 
 class LispEnvironment():
     "Lisp Statement Environment holding variable/value pairs"
@@ -19,7 +22,7 @@ class LispEnvironment():
         if self.inherit is None:
             return "GlobalEnv"
         else:
-            return str(self.env)
+            return str(self.env)+"->"+str(self.inherit)
 
 class LispProcedure():
     "Defines a lisp procedure given by a lambda function"
@@ -27,9 +30,7 @@ class LispProcedure():
         """Given a tree like (lambda (x) (* x x)), create an internal
          representation of the procedure"""
         if debug:
-            print "Creating procedure,", tree
-            if outer_env is not None:
-                print "Environment:", outer_env
+            print "Creating procedure,", tree, "(%s)"%(str(outer_env))
         self.tree = tree
         assert self.tree[0] == "lambda"
         assert len(self.tree) == 3
@@ -39,20 +40,19 @@ class LispProcedure():
         self.args = self.tree[1]
         for a in self.args:
             assert type(a) == str
-        self.internal_env = LispEnvironment(outer_env)
         self.return_statement = self.tree[2]
+        self.outer_env = outer_env
 
     def apply(self, arg_values):
         """Applies the procedure to the given arguments, which are
         already evaluated. arg_values should be list of primitive
         numbers or procedures"""
+        self.internal_env = LispEnvironment(self.outer_env)
         if debug:
-            print "Applying procedure,", self.tree
-            if self.internal_env is not None:
-                print "Environment:", self.internal_env
+            print "Applying procedure,", self.tree, "(%s)"%(str(self.internal_env))
         assert type(arg_values) == list
         for x in arg_values:
-            assert (type(x)==float or type(x)==int or
+            assert (type(x) in PrimitiveDataTypes or
                 isinstance(x,LispProcedure))
         # first check whether arguments match in number
         assert len(arg_values) == self.num_args
@@ -60,22 +60,27 @@ class LispProcedure():
         for (variable,value) in zip(self.args,arg_values):
             self.internal_env[variable] = value
         # return a LispStatement with a new environment
+        if debug:
+            print "returning from procedure",self.tree,arg_values,self.return_statement, self.internal_env
         return LispStatement(self.return_statement,
-                             self.internal_env)
+                             LispEnvironment(self.internal_env))
 
 class PrimitiveLispProcedure(LispProcedure):
-    def __init__(self, fxn):
+    def __init__(self, name, fxn):
+        self.name = name
         self.fxn = fxn
     def apply(self, arg_values):
+        if debug:
+            print "calling primitive procedure",self.name,"on", arg_values
         return LispStatement(self.fxn(arg_values))
 
 class LispStatement():
     "The internal representation of a lisp statement"
     def __init__(self, tree, env=None):
-        if debug:
-            print "Creating statement,", tree
-            if env is not None:
-                print "Environment:", env
+        # if debug:
+        #     print "Creating statement,", tree
+        #     if env is not None:
+        #         print "Environment:", env
         self.tree = tree
         if env is None:
             env = globalEnv
@@ -96,9 +101,7 @@ class LispStatement():
              b. Evaluating the new body
         """
         if debug:
-            print "Evaluating statement,", self.tree
-            if self.environment is not None:
-                print "Environment:", self.environment
+            print "Evaluating statement,", self.tree, "(%s)"%(str(self.environment))
         if type(self.tree) == list:
             # either spl form or application
             operator = self.tree[0]
@@ -108,7 +111,7 @@ class LispStatement():
                 assert len(self.tree) == 3
                 a = self.tree[1]
                 b = self.tree[2]
-                self.environment[a] = LispStatement(b).evaluate()
+                globalEnv[a] = LispStatement(b).evaluate()
                 return self.environment[a]
             elif operator == "lambda":
                 return LispProcedure(self.tree, self.environment)
@@ -132,7 +135,7 @@ class LispStatement():
                     operator = self.environment[operator]
                     if isinstance(operator, LispProcedure):
                         pass
-                    elif type(operator) == float or type(operator) == int:
+                    elif type(operator) in PrimitiveDataTypes:
                         assert len(self.tree) == 1
                         return operator
                 # also check "upper" environments
@@ -154,12 +157,14 @@ class LispStatement():
             # it is either primitive data or primitive procedure
             # or it might be VARIABLE NAME denoting one of these
             x = self.tree
-            if type(x) == float or type(x) == int:
+            if type(x) in PrimitiveDataTypes:
                 # primitive data ... return directly
                 if debug:
                     print "Statement evaluated to,",x
                 return x
             elif type(x) == str:
+                if debug:
+                    print "Statement evaluated to,",self.environment[x]
                 return self.environment[x]
 
 ###################################################################
@@ -168,16 +173,16 @@ class LispStatement():
 
 globalEnv = LispEnvironment()
 
-globalEnv['+'] = PrimitiveLispProcedure(lambda l: sum(l))
-globalEnv['-'] = PrimitiveLispProcedure(
+globalEnv['+'] = PrimitiveLispProcedure('+',lambda l: sum(l))
+globalEnv['-'] = PrimitiveLispProcedure('-',
                     lambda l: (l[0]-l[1] if len(l)==2 else -l[0])
                     )
-globalEnv['*'] = PrimitiveLispProcedure(
+globalEnv['*'] = PrimitiveLispProcedure('*',
                     lambda l: reduce(lambda x,y:x*y, l)
                     )
-globalEnv['/'] = PrimitiveLispProcedure(lambda (x,y): float(x)/y)
-globalEnv['>'] = PrimitiveLispProcedure(lambda (x,y): x>y)
-globalEnv['<'] = PrimitiveLispProcedure(lambda (x,y): x<y)
-globalEnv['>='] = PrimitiveLispProcedure(lambda (x,y): x>=y)
-globalEnv['<='] = PrimitiveLispProcedure(lambda (x,y): x<=y)
-globalEnv['abs'] = PrimitiveLispProcedure(lambda (x,): abs(x))
+globalEnv['/'] = PrimitiveLispProcedure('/',lambda (x,y): float(x)/y)
+globalEnv['>'] = PrimitiveLispProcedure('>',lambda (x,y): x>y)
+globalEnv['<'] = PrimitiveLispProcedure('<',lambda (x,y): x<y)
+globalEnv['>='] = PrimitiveLispProcedure('>=',lambda (x,y): x>=y)
+globalEnv['<='] = PrimitiveLispProcedure('<=',lambda (x,y): x<=y)
+globalEnv['abs'] = PrimitiveLispProcedure('abs',lambda (x,): abs(x))
