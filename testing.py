@@ -23,12 +23,14 @@ class TestEvaluator(unittest.TestCase):
 class TestProcedures(unittest.TestCase):
     "Test functioning of LispProcedure class"
     def testSimpleProcedure(self):
-        p = lisp_interpreter.LispProcedure(['lambda',['x'],['x']],{})
+        p = lisp_interpreter.LispProcedure(['lambda',['x'],['x']],
+                                            lisp_interpreter.globalEnv)
         r = p.apply([2]).evaluate()
         e = 2
         self.assertEqual(e, r)
     def testArithmeticProcedure(self):
-        p = lisp_interpreter.LispProcedure(['lambda',['x'],['*','x','x']],{})
+        p = lisp_interpreter.LispProcedure(['lambda',['x'],['*','x','x']],
+                                            lisp_interpreter.globalEnv)
         r = p.apply([2]).evaluate()
         e = 4
         self.assertEqual(e, r)

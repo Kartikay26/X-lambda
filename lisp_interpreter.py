@@ -1,8 +1,18 @@
-from copy import deepcopy as copy
-
-# TODO: define global env here
-# TODO: Environment class which can get variable from outer envs also
-globalEnv = {}
+class LispEnvironment():
+    "Lisp Statement Environment holding variable/value pairs"
+    def __init__(self, inherit=None):
+        self.inherit = inherit
+        self.env = {}
+    def __setitem__(self, variable, value):
+        self.env[variable] = value
+    def __getitem__(self, variable):
+        if variable in self.env:
+            return self.env[variable]
+        else:
+            if self.inherit is not None:
+                return self.inherit[variable]
+            else:
+                raise KeyError("No such variable, "+variable+".")
 
 class LispProcedure():
     "Defines a lisp procedure given by a lambda function"
@@ -18,7 +28,7 @@ class LispProcedure():
         self.args = self.tree[1]
         for a in self.args:
             assert type(a) == str
-        self.internal_env = copy(outer_env)
+        self.internal_env = LispEnvironment(outer_env)
         self.return_statement = self.tree[2]
 
     def apply(self, arg_values):
@@ -36,6 +46,12 @@ class LispProcedure():
         # return a LispStatement with a new environment
         return LispStatement(self.return_statement,
                              self.internal_env)
+
+class PrimitiveLispProcedure(LispProcedure):
+    def __init__(self, fxn):
+        self.fxn = fxn
+    def apply(self, arg_values):
+        return LispStatement(self.fxn(arg_values))
 
 class LispStatement():
     "The internal representation of a lisp statement"
@@ -100,3 +116,12 @@ class LispStatement():
                 return x
             elif type(x) == str:
                 return self.environment[x]
+
+###################################################################
+
+# define global env
+
+globalEnv = LispEnvironment()
+
+globalEnv['+'] = PrimitiveLispProcedure(lambda l: sum(l))
+globalEnv['*'] = PrimitiveLispProcedure(lambda (x,y): x*y)
