@@ -12,8 +12,8 @@ class TestProcedures(unittest.TestCase):
         self.assertEqual(e, r)
     def testArithmeticProcedure(self):
         p = lisp_interpreter.LispProcedure(['lambda',['x'],['*','x','x']],{})
-        r = p.apply([2])
-        e = ['*',2,2]
+        r = p.apply([2]).evaluate()
+        e = 4
         self.assertEqual(e, r)
 
 class TestTokeniser(unittest.TestCase):
