@@ -12,6 +12,8 @@ def main():
         # read
         try:
             i = raw_input(">>> ")
+            if i == "":
+                continue
         except (EOFError, KeyboardInterrupt):
             break
         # eval
