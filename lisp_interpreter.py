@@ -102,8 +102,12 @@ class LispStatement():
                 # also check "upper" environments
                 # make sure it is a function
                 # evaluate arguments
-                operands = [LispStatement(self.tree[i]).evaluate()
-                           for i in range(1,len(self.tree))]
+                operands = [LispStatement(
+                                self.tree[i],
+                                self.environment
+                                ).evaluate()
+                                for i in range(1,len(self.tree))
+                                ]
                 # apply the function
                 new_statement = operator.apply(operands)
                 return new_statement.evaluate()
